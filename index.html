@@ -3,85 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>원고지 집필 대시보드</title>
+    <title>원고지 집필실 - 최종본</title>
     
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    
     <style>
         :root { 
-            --primary: #e74c3c; /* 원고지 붉은색 */
-            --bg: #fdf6e3;      /* 따뜻한 미색 배경 */
+            --primary: #e74c3c; 
+            --bg: #fdf6e3;      
             --card-bg: #ffffff; 
             --text: #2c3e50; 
-            --line: #f5cfcf;    /* 연한 붉은 라인 */
+            --line: #f5cfcf; 
         }
-        body { font-family: 'Pretendard', 'Nanum Myeongjo', serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        body { font-family: 'Pretendard', serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         
-        .top-section { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1200px; margin: 0 auto 30px; }
-        .card { background: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--line); }
+        .layout-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1200px; margin: 0 auto 30px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--line); }
 
         /* 좌측 대시보드 */
-        .left-dash { display: flex; flex-direction: column; justify-content: center; text-align: center; border: 2px solid var(--primary); }
-        #displayTitle { font-size: 1.2rem; color: var(--primary); font-weight: bold; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 20px; }
-        #displayPercent { font-size: 5rem; font-weight: 800; color: var(--primary); margin: 0; }
-        .bar-bg { background: #eee; height: 8px; border-radius: 10px; margin: 30px auto; width: 80%; overflow: hidden; }
+        .dash-panel { display: flex; flex-direction: column; justify-content: center; text-align: center; border: 2px solid var(--primary); }
+        #displayTitle { font-size: 1.2rem; color: var(--primary); font-weight: bold; margin-bottom: 10px; letter-spacing: 2px; }
+        #displayPercent { font-size: 5.5rem; font-weight: 800; color: var(--primary); margin: 0; line-height: 1.1; }
+        #displayDday { font-size: 1.2rem; font-weight: bold; color: #c0392b; margin-top: 10px; }
+        .bar-bg { background: #eee; height: 10px; border-radius: 10px; margin: 25px auto; width: 80%; overflow: hidden; }
         .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: 1s ease; }
 
-        /* 우측 캘린더 */
-        #calendar { background: white; padding: 10px; border-radius: 5px; height: 450px; }
-        .fc-event { background: var(--primary) !important; border: none !important; color: white !important; padding: 2px; }
-        .fc-daygrid-day.fc-day-today { background: rgba(231, 76, 60, 0.05) !important; }
+        /* 우측 캘린더 영역 */
+        .calendar-panel { min-height: 500px; }
+        #calendar { height: 100%; }
+        .fc-toolbar-title { font-size: 1.1rem !important; color: var(--primary) !important; }
+        .fc-event { background: var(--primary) !important; border: none !important; padding: 2px 5px; }
 
-        /* 하단 테이블 */
-        .bottom-section { max-width: 1200px; margin: 0 auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { color: var(--primary); font-size: 0.8rem; border-bottom: 2px solid var(--primary); padding: 10px; }
-        td { padding: 12px 5px; border-bottom: 1px solid var(--line); text-align: center; }
-        input { border: 1px solid transparent; padding: 5px; text-align: center; font-family: inherit; font-size: 0.9rem; }
-        input:focus { border-bottom: 1px solid var(--primary); outline: none; background: #fff5f5; }
+        /* 하단 워크시트 */
+        .sheet-section { max-width: 1200px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { color: var(--primary); font-size: 0.8rem; border-bottom: 2px solid var(--primary); padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid var(--line); text-align: center; }
         
-        .active-row { background: #fff9f9; border-left: 4px solid var(--primary); }
-        .record-btn { background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
-        .add-btn { background: white; color: var(--primary); border: 1px solid var(--primary); padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; font-weight: bold; width: 100%; }
-        .add-btn:hover { background: var(--primary); color: white; }
+        input { border: 1px solid transparent; padding: 6px; text-align: center; font-size: 0.9rem; background: transparent; width: 100%; outline: none; }
+        input:focus { background: #fff5f5; border-bottom: 1px solid var(--primary); }
+        input[type="date"] { color-scheme: light; width: auto; }
+
+        .active-row { background: #fffafa; border-left: 5px solid var(--primary); }
+        .record-btn { background: var(--primary); color: white; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .add-btn { background: white; color: var(--primary); border: 2px dashed var(--primary); padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 20px; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="top-section">
-    <div class="card left-dash">
-        <div id="displayTitle">작품 선택 전</div>
+<div class="layout-grid">
+    <div class="card dash-panel">
+        <div id="displayTitle">작품을 선택하세요</div>
         <div id="displayPercent">0%</div>
+        <div id="displayDday">D-Day 미설정</div>
         <div class="bar-bg"><div id="progressBar" class="bar-fill"></div></div>
-        <div id="displayStats" style="font-size: 0.9rem; color: #7f8c8d;">원고지에 마음을 담는 시간</div>
+        <div style="opacity: 0.6; font-size: 0.85rem;">마감은 새로운 시작의 약속입니다.</div>
     </div>
-    <div class="card">
+
+    <div class="card calendar-panel">
         <div id='calendar'></div>
     </div>
 </div>
 
-<div class="bottom-section">
+<div class="sheet-section">
     <div class="card">
-        <h2 style="font-size: 0.9rem; color: var(--primary);">원고지 워크시트</h2>
+        <h2 style="font-size: 1rem; color: var(--primary); margin-bottom: 20px;">🖋️ 집필 워크시트</h2>
         <table>
             <thead>
                 <tr>
                     <th>작품명</th>
                     <th>누적 자수</th>
                     <th>목표 자수</th>
-                    <th>날짜 선택</th>
-                    <th>집필량 입력</th>
+                    <th>마감일 설정</th>
+                    <th>집필 날짜</th>
+                    <th>오늘 쓴 양</th>
                     <th>기록</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
-        <button id="addBtn" class="add-btn" onclick="addNewRow()">+ 새 작품 추가 (최대 5개)</button>
+        <button id="addBtn" class="add-btn" onclick="addNewRow()">+ 새로운 집필 프로젝트 추가</button>
     </div>
 </div>
 
 <script>
-    let works = JSON.parse(localStorage.getItem('writerStudio_V3')) || [
-        { title: "나의 소설 A", current: 0, target: 50000, dailyLogs: {} }
+    let works = JSON.parse(localStorage.getItem('Writer_Final_V5')) || [
+        { title: "첫 소설", current: 0, target: 50000, deadline: "", dailyLogs: {} }
     ];
     let selectedIdx = 0;
     let calendar;
@@ -91,13 +98,116 @@
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'ko',
-            height: 'auto',
-            headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
-            events: getCalendarEvents()
+            headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+            events: function(info, successCallback) {
+                successCallback(getCalendarEvents());
+            }
         });
         calendar.render();
         renderTable();
     });
 
     function getCalendarEvents() {
-        const work =
+        const work = works[selectedIdx];
+        const events = [];
+        if (work && work.dailyLogs) {
+            for (let date in work.dailyLogs) {
+                events.push({ title: work.dailyLogs[date].toLocaleString() + '자', start: date });
+            }
+        }
+        return events;
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        const todayStr = new Date().toLocaleDateString('en-CA');
+
+        works.forEach((work, idx) => {
+            const tr = document.createElement('tr');
+            if(idx === selectedIdx) tr.className = 'active-row';
+            tr.onclick = (e) => { 
+                if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') { 
+                    selectedIdx = idx; 
+                    refreshEverything(); 
+                }
+            };
+            
+            tr.innerHTML = `
+                <td><input type="text" value="${work.title}" onchange="updateInfo(${idx}, 'title', this.value)"></td>
+                <td><input type="number" value="${work.current}" onchange="updateInfo(${idx}, 'current', this.value)"></td>
+                <td><input type="number" value="${work.target}" onchange="updateInfo(${idx}, 'target', this.value)"></td>
+                <td><input type="date" value="${work.deadline || ''}" onchange="updateInfo(${idx}, 'deadline', this.value)"></td>
+                <td><input type="date" id="date-${idx}" value="${todayStr}"></td>
+                <td><input type="number" id="input-${idx}" placeholder="글자 수"></td>
+                <td><button class="record-btn" onclick="addLog(${idx})">기록</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('addBtn').style.display = works.length >= 5 ? 'none' : 'block';
+        updateDashboard();
+    }
+
+    function addLog(idx) {
+        const d = document.getElementById(`date-${idx}`).value;
+        const v = document.getElementById(`input-${idx}`).value;
+        if(!d || !v) return;
+
+        const val = parseInt(v);
+        works[idx].dailyLogs[d] = (works[idx].dailyLogs[d] || 0) + val;
+        works[idx].current += val;
+        
+        document.getElementById(`input-${idx}`).value = '';
+        saveData();
+    }
+
+    function updateInfo(idx, key, val) {
+        works[idx][key] = (key === 'current' || key === 'target') ? parseInt(val) || 0 : val;
+        saveData();
+    }
+
+    function addNewRow() {
+        if(works.length < 5) {
+            works.push({ title: "새 작품", current: 0, target: 50000, deadline: "", dailyLogs: {} });
+            saveData();
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('Writer_Final_V5', JSON.stringify(works));
+        refreshEverything();
+    }
+
+    function refreshEverything() {
+        calendar.refetchEvents();
+        renderTable();
+    }
+
+    function updateDashboard() {
+        const w = works[selectedIdx];
+        const p = ((w.current / w.target) * 100).toFixed(1);
+        document.getElementById('displayTitle').innerText = w.title;
+        document.getElementById('displayPercent').innerText = `${Math.floor(p)}%`;
+        document.getElementById('progressBar').style.width = `${p}%`;
+
+        // D-Day 계산 로직
+        const dDayElement = document.getElementById('displayDday');
+        if (w.deadline) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(w.deadline);
+            targetDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 0) dDayElement.innerText = `마감까지 D-${diffDays}`;
+            else if (diffDays === 0) dDayElement.innerText = `오늘이 마감일입니다!`;
+            else dDayElement.innerText = `마감일이 ${Math.abs(diffDays)}일 지났습니다`;
+        } else {
+            dDayElement.innerText = "마감일 미설정";
+        }
+    }
+</script>
+</body>
+</html>
