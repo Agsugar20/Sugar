@@ -3,106 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Midnight Writing Studio</title>
+    <title>Midnight Writing Studio - Multi</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
 
     <style>
         :root { 
-            --primary: #f1c40f; /* 별빛 금색 */
-            --bg: #0f172a;      /* 깊은 밤의 색 */
-            --card-bg: #1e293b; /* 서재 책상 색 */
-            --text: #e2e8f0; 
+            --primary: #f1c40f; --bg: #0f172a; --card-bg: #1e293b; --text: #e2e8f0; 
         }
         body { 
-            font-family: 'Pretendard', 'Apple SD Gothic Neo', serif; 
-            background: var(--bg); 
-            color: var(--text);
-            display: flex; justify-content: center; padding: 40px 20px; 
-            margin: 0;
+            font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text);
+            display: flex; flex-direction: column; align-items: center; padding: 40px 20px; margin: 0;
         }
-        .container { width: 100%; max-width: 800px; }
+        .container { width: 100%; max-width: 900px; }
         .card { 
             background: var(--card-bg); padding: 30px; border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        h2 { margin-top: 0; font-size: 1.2rem; color: var(--primary); letter-spacing: 1px; }
+        h2 { margin-top: 0; font-size: 1rem; color: var(--primary); opacity: 0.8; text-transform: uppercase; }
         
-        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px; }
-        .input-box { display: flex; flex-direction: column; }
-        label { font-size: 0.8rem; margin-bottom: 8px; opacity: 0.8; }
-        input { 
-            padding: 12px; border: 1px solid #334155; border-radius: 8px; 
-            font-size: 1rem; background: #0f172a; color: white; outline: none;
-        }
-        input:focus { border-color: var(--primary); }
-        
-        .progress-wrapper { margin: 30px 0; }
-        .bar-bg { background: #334155; height: 8px; border-radius: 10px; overflow: hidden; }
+        /* 메인 수식 및 게이지 */
+        #percentageText { font-size: 2.5rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .bar-bg { background: #334155; height: 10px; border-radius: 10px; overflow: hidden; margin: 20px 0; }
         .bar-fill { 
-            background: linear-gradient(90deg, #f1c40f, #e67e22); 
-            height: 100%; width: 0%; transition: 1s cubic-bezier(0.22, 1, 0.36, 1); 
-            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+            background: linear-gradient(90deg, #f1c40f, #e67e22); height: 100%; width: 0%; 
+            transition: 1s ease-in-out; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
         }
-        
-        #percentageText { font-family: 'Georgia', serif; font-size: 2rem; margin-bottom: 5px; }
-        .formula-display { 
-            background: rgba(15, 23, 42, 0.6); padding: 25px; border-radius: 15px; 
-            font-size: 1.1rem; overflow-x: auto; text-align: center;
-            border: 1px dashed rgba(241, 196, 15, 0.3);
+        .formula-display { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; margin-top: 10px; }
+
+        /* 테이블 스타일 (엑셀 느낌) */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: rgba(15, 23, 42, 0.5); }
+        th, td { padding: 12px; border: 1px solid #334155; text-align: center; }
+        th { background: #0f172a; color: var(--primary); font-size: 0.9rem; }
+        input[type="text"], input[type="number"] {
+            width: 90%; background: transparent; border: none; color: white; text-align: center; font-size: 0.95rem;
         }
+        input:focus { background: rgba(255,255,255,0.05); outline: none; }
+        .add-btn { 
+            margin-top: 15px; padding: 8px 15px; background: var(--primary); border: none; 
+            border-radius: 5px; cursor: pointer; font-weight: bold; color: #000;
+        }
+        .active-row { background: rgba(241, 196, 15, 0.1) !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-        <h2>🌙 NIGHT WRITING STUDIO</h2>
-        <div class="input-group">
-            <div class="input-box">
-                <label>목표량 (Goal)</label>
-                <input type="number" id="targetWords" value="50000" oninput="updateAll()">
-            </div>
-            <div class="input-box">
-                <label>현재 달성 (Current)</label>
-                <input type="number" id="currentWords" value="15200" oninput="updateAll()">
-            </div>
-        </div>
+        <h2 id="currentWorkTitle">선택된 작품 없음</h2>
+        <div id="percentageText">0%</div>
+        <div class="bar-bg"><div id="progressBar" class="bar-fill"></div></div>
+        <div id="mathDisplay" class="formula-display"></div>
     </div>
 
     <div class="card">
-        <h2>📊 PROGRESS ANALYSIS</h2>
-        <div id="percentageText">0%</div>
-        <div class="progress-wrapper">
-            <div class="bar-bg"><div id="progressBar" class="bar-fill"></div></div>
-        </div>
-        
-        <div id="mathDisplay" class="formula-display"></div>
+        <h2>📚 작품별 집필 시트 (Work Sheet)</h2>
+        <table id="workTable">
+            <thead>
+                <tr>
+                    <th>작품명</th>
+                    <th>현재 자수</th>
+                    <th>목표 자수</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+        <button class="add-btn" onclick="addNewRow()">+ 새 작품 추가</button>
     </div>
 </div>
 
 <script>
-    function updateAll() {
-        const target = document.getElementById('targetWords').value || 1;
-        const current = document.getElementById('currentWords').value || 0;
-        const percent = ((current / target) * 100).toFixed(1);
-        const remaining = target - current;
+    let works = JSON.parse(localStorage.getItem('myWorks')) || [
+        { title: "첫 번째 소설", current: 12500, target: 50000 }
+    ];
+    let selectedIdx = 0;
 
-        document.getElementById('progressBar').style.width = percent + "%";
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        works.forEach((work, idx) => {
+            const tr = document.createElement('tr');
+            if(idx === selectedIdx) tr.className = 'active-row';
+            tr.onclick = () => selectWork(idx);
+            
+            tr.innerHTML = `
+                <td><input type="text" value="${work.title}" onchange="updateData(${idx}, 'title', this.value)"></td>
+                <td><input type="number" value="${work.current}" onchange="updateData(${idx}, 'current', this.value)"></td>
+                <td><input type="number" value="${work.target}" onchange="updateData(${idx}, 'target', this.value)"></td>
+                <td><button onclick="deleteWork(${idx})" style="background:none; border:none; color:#ff7675; cursor:pointer;">삭제</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        updateDashboard();
+    }
+
+    function updateData(idx, key, value) {
+        works[idx][key] = key === 'title' ? value : parseInt(value) || 0;
+        saveAndRender();
+    }
+
+    function selectWork(idx) {
+        selectedIdx = idx;
+        renderTable();
+    }
+
+    function addNewRow() {
+        works.push({ title: "새 작품", current: 0, target: 50000 });
+        saveAndRender();
+    }
+
+    function deleteWork(idx) {
+        if(works.length > 1) {
+            works.splice(idx, 1);
+            selectedIdx = 0;
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('myWorks', JSON.stringify(works));
+        renderTable();
+    }
+
+    function updateDashboard() {
+        const work = works[selectedIdx];
+        if(!work) return;
+
+        const percent = ((work.current / work.target) * 100).toFixed(1);
+        const remaining = work.target - work.current;
+
+        document.getElementById('currentWorkTitle').innerText = `Editing: ${work.title}`;
         document.getElementById('percentageText').innerText = `${percent}%`;
+        document.getElementById('progressBar').style.width = `${percent}%`;
 
-        const mathArea = document.getElementById('mathDisplay');
+        // LaTeX 수식 (요청하신 대로 텍스트 제거)
         const formula = `
-            \\text{Efficiency: } \\eta = \\frac{${current}}{${target}} \\approx ${percent}\\% \\\\
-            \\text{To go: } W_{remain} = ${remaining.toLocaleString()}
+            P = \\frac{${work.current}}{${work.target}} \\times 100 = ${percent}\\% \\\\
+            W_{rem} = ${work.target} - ${work.current} = ${remaining.toLocaleString()}
         `;
         
+        const mathArea = document.getElementById('mathDisplay');
         mathArea.innerHTML = "$$" + formula + "$$";
         
-        renderMathInElement(document.body, {
-            delimiters: [{left: "$$", right: "$$", display: true}]
-        });
+        renderMathInElement(mathArea, { delimiters: [{left: "$$", right: "$$", display: true}] });
+    }
 
-        localStorage.setItem('writingData_midnight', JSON.stringify({target, current}));
+    window.onload = renderTable;
+</script>
+</body>
+</html>
